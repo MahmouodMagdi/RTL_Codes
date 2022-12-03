@@ -3,17 +3,6 @@
 // 
 // Engineer: Mahmoud Magdi
 // 
-// Design Name: Serial In Serial Out Shift Register 
-// Module Name: SISO
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
-
- `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// 
-// Engineer: Mahmoud Magdi
-// 
 // Create Date: 12/03/2022 03:14:16 PM
 // Design Name: Serial In Serial Out Shift Register 
 // Module Name: SISO
