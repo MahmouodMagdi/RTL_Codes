@@ -1,3 +1,6 @@
+// ********************************* GARAGE SYSTEM MODULE *********************************
+// AUTHOR: MAHMOUD MAGDI
+
 module GARAGE_SYSTEM(	
 
 // Input Ports
