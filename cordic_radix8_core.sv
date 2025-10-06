@@ -35,35 +35,45 @@ module cordic_radix8_core #(
   typedef logic signed [ZW-1:0]  sz_t;
 
   // Fixed tables via constant functions (Icarus-friendly)
-  // atan_q: QZ_FRAC arctan(2^-k) for k in [0, ITER_MAX-1]; Z_FRAC=30
+  // atan_q: QZ_FRAC arctan(2^-k) for k in [0, ITER_MAX-1]; base constants are Q30, scaled to Z_FRAC
+  localparam int SHIFT_RIGHT = (30 > Z_FRAC) ? (30 - Z_FRAC) : 0;
+  localparam int SHIFT_LEFT  = (Z_FRAC > 30) ? (Z_FRAC - 30) : 0;
   function automatic sz_t atan_q (input int idx);
+    int unsigned val30;
     case (idx)
-      0:  atan_q = sz_t'(32'd843314857);
-      1:  atan_q = sz_t'(32'd497837829);
-      2:  atan_q = sz_t'(32'd263043837);
-      3:  atan_q = sz_t'(32'd133525159);
-      4:  atan_q = sz_t'(32'd67021687);
-      5:  atan_q = sz_t'(32'd33543516);
-      6:  atan_q = sz_t'(32'd16775851);
-      7:  atan_q = sz_t'(32'd8388437);
-      8:  atan_q = sz_t'(32'd4194283);
-      9:  atan_q = sz_t'(32'd2097149);
-      10: atan_q = sz_t'(32'd1048576);
-      11: atan_q = sz_t'(32'd524288);
-      12: atan_q = sz_t'(32'd262144);
-      13: atan_q = sz_t'(32'd131072);
-      14: atan_q = sz_t'(32'd65536);
-      15: atan_q = sz_t'(32'd32768);
-      16: atan_q = sz_t'(32'd16384);
-      17: atan_q = sz_t'(32'd8192);
-      18: atan_q = sz_t'(32'd4096);
-      19: atan_q = sz_t'(32'd2048);
-      20: atan_q = sz_t'(32'd1024);
-      21: atan_q = sz_t'(32'd512);
-      22: atan_q = sz_t'(32'd256);
-      23: atan_q = sz_t'(32'd128);
-      default: atan_q = '0;
+      0:  val30 = 32'd843314857;
+      1:  val30 = 32'd497837829;
+      2:  val30 = 32'd263043837;
+      3:  val30 = 32'd133525159;
+      4:  val30 = 32'd67021687;
+      5:  val30 = 32'd33543516;
+      6:  val30 = 32'd16775851;
+      7:  val30 = 32'd8388437;
+      8:  val30 = 32'd4194283;
+      9:  val30 = 32'd2097149;
+      10: val30 = 32'd1048576;
+      11: val30 = 32'd524288;
+      12: val30 = 32'd262144;
+      13: val30 = 32'd131072;
+      14: val30 = 32'd65536;
+      15: val30 = 32'd32768;
+      16: val30 = 32'd16384;
+      17: val30 = 32'd8192;
+      18: val30 = 32'd4096;
+      19: val30 = 32'd2048;
+      20: val30 = 32'd1024;
+      21: val30 = 32'd512;
+      22: val30 = 32'd256;
+      23: val30 = 32'd128;
+      default: val30 = 32'd0;
     endcase
+    if (SHIFT_RIGHT != 0) begin
+      atan_q = sz_t'($signed(val30) >>> SHIFT_RIGHT);
+    end else if (SHIFT_LEFT != 0) begin
+      atan_q = sz_t'($signed(val30) <<< SHIFT_LEFT);
+    end else begin
+      atan_q = sz_t'(val30);
+    end
   endfunction
 
   // K_INV_TABLE: QXY_FRAC product_{i=0..n-1} 1/sqrt(1 + 2^{-2i})
@@ -260,9 +270,7 @@ module cordic_radix8_core #(
     if (GROUP_SIZE > 3) begin
       $error("GROUP_SIZE > 3 not supported in this implementation");
     end
-    if (Z_FRAC != 30) begin
-      $warning("Z_FRAC != 30: ATAN_TABLE was generated for Q30; update constants accordingly");
-    end
+    // Z_FRAC scaling supported via atan_q function
   end
 
 endmodule
